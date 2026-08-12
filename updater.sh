@@ -18,10 +18,15 @@ export PATH="$BIN_DIR:$PATH"
 
 install_packages() {
     if command -v pkg >/dev/null 2>&1; then
-        pkg update -y
+        echo "[+] Enabling Termux X11 repository..."
+        pkg install -y x11-repo 2>/dev/null || true
+        pkg update -y || true
         pkg install -y "$@"
     elif command -v apt-get >/dev/null 2>&1; then
-        apt-get update -y
+        if grep -q "termux" /etc/apt/sources.list 2>/dev/null || [ -d "/data/data/com.termux" ]; then
+            apt-get install -y x11-repo 2>/dev/null || true
+        fi
+        apt-get update -y || true
         apt-get install -y "$@"
     elif command -v yum >/dev/null 2>&1; then
         yum install -y "$@"
@@ -38,9 +43,15 @@ echo "   🚀 TERMUX VNC & BROWSER AUTOMATIC SYSTEM UPDATER   "
 echo "======================================================="
 
 # 1. Update package lists & installed packages
-echo "[+] Updating package repositories & upgrading packages..."
-install_packages tigervnc-standalone-server tigervnc-common xfce4 xfce4-terminal net-tools git wget curl netsurf-gtk chromium || \
-install_packages tigervnc xfce4 xfce4-terminal net-tools git wget curl termux-tools netsurf chromium || true
+echo "[+] Installing essential base packages..."
+install_packages git curl wget net-tools || true
+
+echo "[+] Installing VNC desktop & XFCE4 environment..."
+install_packages tigervnc xfce4 xfce4-terminal || \
+install_packages tigervnc-standalone-server tigervnc-common xfce4 xfce4-terminal || true
+
+echo "[+] Installing Web Browsers..."
+install_packages netsurf-gtk || install_packages netsurf || install_packages chromium || true
 
 # 2. Update noVNC proxy repository
 NOVNC_DIR="$HOME/.novnc"
