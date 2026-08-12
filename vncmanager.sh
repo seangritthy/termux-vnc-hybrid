@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env bash
 
 VNC_PORT=5901
 NOVNC_PORT=6080

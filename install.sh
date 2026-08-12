@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env bash
 set -e
 
 echo "======================================================="
@@ -122,11 +122,12 @@ else
 fi
 
 chmod +x "$HOME/vnc.sh" "$HOME/updater.sh" 2>/dev/null || true
+command -v termux-fix-shebang >/dev/null 2>&1 && termux-fix-shebang "$HOME/vnc.sh" "$HOME/updater.sh" 2>/dev/null || true
 
 # Create global terminal command wrapper in all candidate PATH directories
 echo "[+] Creating 'vnc' global terminal command..."
 WRAPPER_SCRIPT='#!/usr/bin/env bash
-exec "$HOME/vnc.sh" "$@"
+exec bash "$HOME/vnc.sh" "$@"
 '
 
 for bdir in "$BIN_DIR" "/data/data/com.termux/files/usr/bin" "/usr/local/bin" "$HOME/bin" "$HOME/.local/bin"; do
@@ -134,6 +135,7 @@ for bdir in "$BIN_DIR" "/data/data/com.termux/files/usr/bin" "/usr/local/bin" "$
         mkdir -p "$bdir" 2>/dev/null || true
         echo "$WRAPPER_SCRIPT" > "$bdir/vnc" 2>/dev/null || true
         chmod +x "$bdir/vnc" 2>/dev/null || true
+        command -v termux-fix-shebang >/dev/null 2>&1 && termux-fix-shebang "$bdir/vnc" 2>/dev/null || true
     fi
 done
 
@@ -160,11 +162,11 @@ if [ -f "$APK_PATH" ]; then
 fi
 
 # 6. Run updater script to set up browser desktop shortcuts and check internet
-"$HOME/vnc.sh" update
+bash "$HOME/vnc.sh" update
 
 # 7. Start VNC Server
 echo "[+] Starting VNC Server..."
-"$HOME/vnc.sh" start
+bash "$HOME/vnc.sh" start
 
 echo ""
 echo "======================================================="
