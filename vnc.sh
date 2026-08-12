@@ -293,6 +293,56 @@ status_vnc() {
     fi
 }
 
+install_debian_distro() {
+    echo "======================================================="
+    echo "       INSTALLING PROOT DEBIAN LINUX DISTRO            "
+    echo "======================================================="
+    
+    if command -v pkg >/dev/null 2>&1; then
+        pkg update -y || true
+        pkg install -y proot-distro || true
+    elif command -v apt-get >/dev/null 2>&1; then
+        apt-get update -y || true
+        apt-get install -y proot-distro || true
+    fi
+
+    if command -v proot-distro >/dev/null 2>&1; then
+        if ! proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+            echo "[+] Downloading & Installing Debian Linux (this may take 1-3 minutes)..."
+            proot-distro install debian
+        else
+            echo "[+] Debian Linux is already installed!"
+        fi
+
+        echo "[+] Setting up XFCE4 Desktop, Terminal & Firefox inside Debian..."
+        proot-distro login debian -- bash -c "
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -y && \
+            apt-get install -y xfce4 xfce4-terminal dbus-x11 firefox-esr desktop-base || true
+        "
+
+        # Create 'debian' CLI shortcut wrapper across candidate bin paths
+        for bdir in "$BIN_DIR" "/data/data/com.termux/files/usr/bin" "/usr/local/bin" "$HOME/bin" "$HOME/.local/bin"; do
+            if [ -d "$bdir" ] || [ -d "$(dirname "$bdir")" ]; then
+                mkdir -p "$bdir" 2>/dev/null || true
+                cat << 'EOC' > "$bdir/debian"
+#!/usr/bin/env bash
+exec proot-distro login debian "$@"
+EOC
+                chmod +x "$bdir/debian" 2>/dev/null || true
+            fi
+        done
+        echo "======================================================="
+        echo " 🎉 DEBIAN LINUX INSTALLATION COMPLETE!"
+        echo "======================================================="
+        echo " You can now start VNC with Debian Desktop by typing:"
+        echo "   vnc start"
+        echo "======================================================="
+    else
+        echo "[!] proot-distro is not supported on this platform."
+    fi
+}
+
 update_vnc() {
     if [ -f "$HOME/updater.sh" ]; then
         bash "$HOME/updater.sh"
@@ -305,6 +355,10 @@ update_vnc() {
 
 case "$1" in
     start)
+        if command -v proot-distro >/dev/null 2>&1 && ! proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+            echo "[!] PRoot Debian is not installed yet. Installing Debian now..."
+            install_debian_distro
+        fi
         start_vnc
         ;;
     stop)
@@ -312,6 +366,9 @@ case "$1" in
         ;;
     status)
         status_vnc
+        ;;
+    debian-install|setup-debian|install-debian)
+        install_debian_distro
         ;;
     update|updater)
         update_vnc
