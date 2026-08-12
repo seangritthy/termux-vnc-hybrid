@@ -168,7 +168,7 @@ EOF
 ensure_xstartup() {
     mkdir -p "$HOME/.vnc"
     cat << 'EOF' > "$HOME/.vnc/xstartup"
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env bash
 unset SESSION_MANAGER
 unset DBUS_SESSION_BUS_ADDRESS
 
@@ -199,6 +199,7 @@ if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | gr
 fi
 EOF
     chmod +x "$HOME/.vnc/xstartup"
+    command -v termux-fix-shebang >/dev/null 2>&1 && termux-fix-shebang "$HOME/.vnc/xstartup" 2>/dev/null || true
 }
 
 start_vnc() {
