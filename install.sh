@@ -20,12 +20,16 @@ fi
 # Package installer helper function
 install_packages() {
     if command -v pkg >/dev/null 2>&1; then
+        echo "[+] Upgrading Termux packages to resolve OpenSSL/libngtcp2 library conflicts..."
+        pkg upgrade -y -o Dpkg::Options::="--force-confnew" 2>/dev/null || true
         echo "[+] Enabling Termux X11 repository..."
         pkg install -y x11-repo 2>/dev/null || true
         pkg update -y || true
         pkg install -y "$@"
     elif command -v apt-get >/dev/null 2>&1; then
         if grep -q "termux" /etc/apt/sources.list 2>/dev/null || [ -d "/data/data/com.termux" ]; then
+            apt-get update -y || true
+            apt-get full-upgrade -y 2>/dev/null || true
             apt-get install -y x11-repo 2>/dev/null || true
         fi
         apt-get update -y || true
@@ -41,7 +45,7 @@ install_packages() {
 }
 
 # 1. Update and install required packages in stages
-echo "[+] Installing essential base packages (git, curl, wget, net-tools)..."
+echo "[+] Upgrading and installing essential base packages (git, curl, wget, net-tools)..."
 install_packages git curl wget net-tools || true
 
 echo "[+] Installing VNC & XFCE4 Desktop Environment..."
@@ -54,9 +58,13 @@ install_packages netsurf-gtk || install_packages netsurf || install_packages chr
 # 2. Setup noVNC
 NOVNC_DIR="$HOME/.novnc"
 if [ ! -d "$NOVNC_DIR" ]; then
-    echo "[+] Cloning noVNC web proxy into $NOVNC_DIR..."
-    git clone --depth 1 https://github.com/novnc/noVNC.git "$NOVNC_DIR"
-    git clone --depth 1 https://github.com/novnc/websockify "$NOVNC_DIR/utils/websockify"
+    echo "[+] Setting up noVNC web proxy in $NOVNC_DIR..."
+    git clone --depth 1 https://github.com/novnc/noVNC.git "$NOVNC_DIR" 2>/dev/null || \
+    (mkdir -p "$NOVNC_DIR" && wget -qO- https://github.com/novnc/noVNC/archive/refs/heads/master.tar.gz | tar -xz -C "$NOVNC_DIR" --strip-components=1) || true
+
+    mkdir -p "$NOVNC_DIR/utils/websockify"
+    git clone --depth 1 https://github.com/novnc/websockify "$NOVNC_DIR/utils/websockify" 2>/dev/null || \
+    (wget -qO- https://github.com/novnc/websockify/archive/refs/heads/master.tar.gz | tar -xz -C "$NOVNC_DIR/utils/websockify" --strip-components=1) || true
 fi
 
 # 3. Setup VNC Password if not set
@@ -75,26 +83,31 @@ if [ -f "$SCRIPT_SRC/vnc.sh" ]; then
     cp -f "$SCRIPT_SRC/vnc.sh" "$HOME/vnc.sh"
 else
     echo "[+] Downloading vnc.sh script from GitHub..."
-    curl -sSL "$GITHUB_RAW/vnc.sh" -o "$HOME/vnc.sh"
+    curl -sSL "$GITHUB_RAW/vnc.sh" -o "$HOME/vnc.sh" 2>/dev/null || wget -qO "$HOME/vnc.sh" "$GITHUB_RAW/vnc.sh" || true
 fi
 
 if [ -f "$SCRIPT_SRC/updater.sh" ]; then
     cp -f "$SCRIPT_SRC/updater.sh" "$HOME/updater.sh"
 else
     echo "[+] Downloading updater.sh script from GitHub..."
-    curl -sSL "$GITHUB_RAW/updater.sh" -o "$HOME/updater.sh"
+    curl -sSL "$GITHUB_RAW/updater.sh" -o "$HOME/updater.sh" 2>/dev/null || wget -qO "$HOME/updater.sh" "$GITHUB_RAW/updater.sh" || true
 fi
 
 chmod +x "$HOME/vnc.sh" "$HOME/updater.sh" 2>/dev/null || true
 
-# Create global terminal command wrapper
-echo "[+] Creating 'vnc' global terminal command in $BIN_DIR..."
-mkdir -p "$BIN_DIR"
-cat << 'EOF' > "$BIN_DIR/vnc"
-#!/usr/bin/env bash
+# Create global terminal command wrapper in all candidate PATH directories
+echo "[+] Creating 'vnc' global terminal command..."
+WRAPPER_SCRIPT='#!/usr/bin/env bash
 exec "$HOME/vnc.sh" "$@"
-EOF
-chmod +x "$BIN_DIR/vnc"
+'
+
+for bdir in "$BIN_DIR" "/data/data/com.termux/files/usr/bin" "/usr/local/bin" "$HOME/bin" "$HOME/.local/bin"; do
+    if [ -d "$bdir" ] || [ -d "$(dirname "$bdir")" ]; then
+        mkdir -p "$bdir" 2>/dev/null || true
+        echo "$WRAPPER_SCRIPT" > "$bdir/vnc" 2>/dev/null || true
+        chmod +x "$bdir/vnc" 2>/dev/null || true
+    fi
+done
 
 # 5. Copy & Install VNC Hybrid Client APK (if on Termux/Android)
 APK_PATH="$SCRIPT_SRC/bin/vnc-hybrid-client.apk"

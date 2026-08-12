@@ -18,12 +18,16 @@ export PATH="$BIN_DIR:$PATH"
 
 install_packages() {
     if command -v pkg >/dev/null 2>&1; then
+        echo "[+] Upgrading Termux packages to resolve library conflicts..."
+        pkg upgrade -y -o Dpkg::Options::="--force-confnew" 2>/dev/null || true
         echo "[+] Enabling Termux X11 repository..."
         pkg install -y x11-repo 2>/dev/null || true
         pkg update -y || true
         pkg install -y "$@"
     elif command -v apt-get >/dev/null 2>&1; then
         if grep -q "termux" /etc/apt/sources.list 2>/dev/null || [ -d "/data/data/com.termux" ]; then
+            apt-get update -y || true
+            apt-get full-upgrade -y 2>/dev/null || true
             apt-get install -y x11-repo 2>/dev/null || true
         fi
         apt-get update -y || true
