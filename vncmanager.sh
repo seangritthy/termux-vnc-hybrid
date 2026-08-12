@@ -21,6 +21,10 @@ start_vnc() {
     
     chmod +x "$HOME/.vnc/xstartup" 2>/dev/null || true
 
+    if command -v termux-wake-lock >/dev/null 2>&1; then
+        termux-wake-lock 2>/dev/null || true
+    fi
+
     if [ ! -f "$HOME/.vnc/passwd" ]; then
         echo "Creating default VNC password ('vnc123')..."
         mkdir -p "$HOME/.vnc"
@@ -32,12 +36,12 @@ start_vnc() {
     sleep 1
 
     echo "Starting VNC server on display $DISPLAY_NUM (Port $VNC_PORT)..."
-    setsid nohup vncserver "$DISPLAY_NUM" -geometry 1280x720 -depth 24 </dev/null >/dev/null 2>&1 &
+    setsid nohup vncserver "$DISPLAY_NUM" -geometry 1280x720 -depth 24 -IdleTimeout 0 -MaxIdleTime 0 </dev/null >/dev/null 2>&1 &
     sleep 3
 
     if [ -d "$NOVNC_DIR" ]; then
         echo "Starting noVNC Web Proxy on port $NOVNC_PORT..."
-        setsid nohup "$NOVNC_DIR/utils/novnc_proxy" --vnc 127.0.0.1:$VNC_PORT --listen $NOVNC_PORT </dev/null > "$HOME/.novnc.log" 2>&1 &
+        setsid nohup "$NOVNC_DIR/utils/novnc_proxy" --vnc 127.0.0.1:$VNC_PORT --listen $NOVNC_PORT --heartbeat 30 </dev/null > "$HOME/.novnc.log" 2>&1 &
         sleep 2
     fi
 

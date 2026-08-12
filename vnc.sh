@@ -37,21 +37,49 @@ ensure_browser_setup() {
 export DISPLAY="${DISPLAY:-:1}"
 export LIBGL_ALWAYS_SOFTWARE=1
 
-if command -v chromium >/dev/null 2>&1; then
+if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+    exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority firefox-esr "$@"
+elif command -v chromium >/dev/null 2>&1; then
     exec chromium --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer "$@"
 elif command -v netsurf-gtk3 >/dev/null 2>&1; then
     exec netsurf-gtk3 "$@"
-elif command -v netsurf >/dev/null 2>&1; then
-    exec netsurf "$@"
 elif command -v firefox >/dev/null 2>&1; then
     exec firefox "$@"
 else
-    echo "No GUI browser found. Installing Chromium & NetSurf..."
-    pkg install -y chromium netsurf
-    exec chromium --no-sandbox --disable-gpu "$@"
+    exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority firefox-esr "$@"
 fi
 EOF
         chmod +x /data/data/com.termux/files/usr/bin/vnc-browser
+    fi
+
+    # Create Debian desktop shortcuts inside proot Debian
+    if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+        proot-distro login debian -- bash -c "mkdir -p /root/Desktop && cat << 'EOF' > /root/Desktop/debian-terminal.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Debian Terminal
+Comment=Open Debian Linux Terminal
+Exec=xfce4-terminal
+Icon=utilities-terminal
+Terminal=false
+Categories=System;TerminalEmulator;
+EOF
+chmod +x /root/Desktop/debian-terminal.desktop
+
+cat << 'EOF' > /root/Desktop/firefox.desktop
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Firefox Web Browser (Debian)
+Comment=Browse the Web using Firefox ESR in Debian
+Exec=firefox-esr %u
+Icon=firefox-esr
+Terminal=false
+Categories=Network;WebBrowser;
+EOF
+chmod +x /root/Desktop/firefox.desktop
+" 2>/dev/null || true
     fi
 
     local DESKTOP_DIR="$HOME/Desktop"
@@ -75,11 +103,16 @@ EOF
 
 start_vnc() {
     echo "======================================================="
-    echo "       STARTING VNC SERVER & DESKTOP (MULTI-DEVICE)    "
+    echo "       STARTING VNC SERVER & DEBIAN DESKTOP (PROOT)    "
     echo "======================================================="
 
     chmod +x "$HOME/.vnc/xstartup" 2>/dev/null || true
     ensure_browser_setup
+
+    if command -v termux-wake-lock >/dev/null 2>&1; then
+        termux-wake-lock 2>/dev/null || true
+        echo "[+] Termux wake lock acquired (prevents Android CPU sleep)."
+    fi
 
     if [ ! -f "$HOME/.vnc/passwd" ]; then
         echo "[+] Setting default VNC password ('vnc123')..."
@@ -93,12 +126,12 @@ start_vnc() {
     sleep 1
 
     echo "[+] Starting TigerVNC server on display $DISPLAY_NUM (Port $VNC_PORT, listening on all IPs)..."
-    setsid nohup vncserver "$DISPLAY_NUM" -geometry 1280x720 -depth 24 -localhost no </dev/null >/dev/null 2>&1 &
+    setsid nohup vncserver "$DISPLAY_NUM" -geometry 1280x720 -depth 24 -localhost no -IdleTimeout 0 -MaxIdleTime 0 </dev/null >/dev/null 2>&1 &
     sleep 3
 
     if [ -d "$NOVNC_DIR" ]; then
         echo "[+] Starting noVNC Web Proxy on Port $NOVNC_PORT (listening on 0.0.0.0)..."
-        setsid nohup "$NOVNC_DIR/utils/novnc_proxy" --vnc 127.0.0.1:$VNC_PORT --listen 0.0.0.0:$NOVNC_PORT </dev/null > "$HOME/.novnc.log" 2>&1 &
+        setsid nohup "$NOVNC_DIR/utils/novnc_proxy" --vnc 127.0.0.1:$VNC_PORT --listen 0.0.0.0:$NOVNC_PORT --heartbeat 30 </dev/null > "$HOME/.novnc.log" 2>&1 &
         sleep 2
     fi
 
@@ -106,7 +139,7 @@ start_vnc() {
 
     echo ""
     echo "======================================================="
-    echo "     VNC IS READY FOR THIS PHONE & OTHER PHONES!       "
+    echo "   VNC IS READY (PROOT DEBIAN DESKTOP + TERMINAL)!     "
     echo "======================================================="
     echo " 1. FOR OTHER PHONES / COMPUTERS ON SAME WI-FI:"
     echo "    - Web Browser Access (noVNC):"
@@ -120,9 +153,10 @@ start_vnc() {
     echo "    - Web Browser: http://127.0.0.1:$NOVNC_PORT/vnc.html?autoconnect=true&password=vnc123"
     echo "    - VNC App:     127.0.0.1:$VNC_PORT"
     echo "-------------------------------------------------------"
-    echo " 3. INTERNET BROWSING & SYSTEM UPDATES:"
-    echo "    - Open Desktop Icon: 'Web Browser' or 'Chromium'"
-    echo "    - Run System Updater: 'vnc update'"
+    echo " 3. DEBIAN SYSTEM & TERMINAL ACCESS:"
+    echo "    - VNC Desktop Environment: Debian XFCE4 Desktop"
+    echo "    - Terminal in VNC Desktop: Debian Terminal (xfce4-terminal)"
+    echo "    - CLI Access in Termux:    type 'debian'"
     echo "======================================================="
 }
 
@@ -149,8 +183,8 @@ status_vnc() {
         echo "[-] noVNC Web Proxy is NOT running."
     fi
 
-    if command -v vnc-browser >/dev/null 2>&1; then
-        echo "[+] Internet Browser launcher is READY (vnc-browser / Chromium / NetSurf)"
+    if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+        echo "[+] Proot-Distro Debian: INSTALLED & Active for VNC Desktop"
     fi
 }
 
