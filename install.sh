@@ -49,8 +49,8 @@ echo "[+] Upgrading and installing essential base packages (git, curl, wget, net
 install_packages git curl wget net-tools || true
 
 echo "[+] Installing VNC & XFCE4 Desktop Environment..."
-install_packages tigervnc xfce4 xfce4-terminal || \
-install_packages tigervnc-standalone-server tigervnc-common xfce4 xfce4-terminal || true
+install_packages tigervnc xfce4 xfce4-terminal dbus || \
+install_packages tigervnc-standalone-server tigervnc-common xfce4 xfce4-terminal dbus || true
 
 echo "[+] Installing Web Browsers & PRoot Distro..."
 install_packages netsurf-gtk proot-distro || install_packages netsurf proot-distro || install_packages chromium proot-distro || true
