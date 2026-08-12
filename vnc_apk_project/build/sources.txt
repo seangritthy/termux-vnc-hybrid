@@ -1,8 +1,0 @@
-/data/data/com.termux/files/home/vnc_apk_project/src/com/vnc/hybrid/ConnectionModel.java
-/data/data/com.termux/files/home/vnc_apk_project/src/com/vnc/hybrid/StorageHelper.java
-/data/data/com.termux/files/home/vnc_apk_project/src/com/vnc/hybrid/VncCanvasView.java
-/data/data/com.termux/files/home/vnc_apk_project/src/com/vnc/hybrid/RfbClient.java
-/data/data/com.termux/files/home/vnc_apk_project/src/com/vnc/hybrid/VncWebActivity.java
-/data/data/com.termux/files/home/vnc_apk_project/src/com/vnc/hybrid/VncNativeActivity.java
-/data/data/com.termux/files/home/vnc_apk_project/src/com/vnc/hybrid/MainActivity.java
-/data/data/com.termux/files/home/vnc_apk_project/gen/com/vnc/hybrid/R.java

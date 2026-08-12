@@ -1,0 +1,5 @@
+vnc_apk_project/build/
+vnc_apk_project/gen/
+.novnc.log
+.xfce.log
+*.pid
