@@ -165,11 +165,39 @@ EOF
     chmod +x "$DESKTOP_DIR/vnc-browser.desktop"
 }
 
+ensure_xstartup() {
+    mkdir -p "$HOME/.vnc"
+    cat << 'EOF' > "$HOME/.vnc/xstartup"
+#!/usr/bin/env bash
+unset SESSION_MANAGER
+unset DBUS_SESSION_BUS_ADDRESS
+
+[ -r $HOME/.Xresources ] && xrdb $HOME/.Xresources
+xsetroot -solid "#121318"
+
+# Disable X11 screen saver and DPMS power saving
+xset s off 2>/dev/null || true
+xset -dpms 2>/dev/null || true
+xset s noblank 2>/dev/null || true
+
+# Start PRoot Debian XFCE4 Desktop if available, else start native XFCE4
+if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+    exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority dbus-launch --exit-with-session startxfce4
+elif command -v startxfce4 >/dev/null 2>&1; then
+    exec startxfce4
+else
+    exec xterm
+fi
+EOF
+    chmod +x "$HOME/.vnc/xstartup"
+}
+
 start_vnc() {
     echo "======================================================="
     echo "       STARTING VNC SERVER & DEBIAN DESKTOP (PROOT)    "
     echo "======================================================="
 
+    ensure_xstartup
     chmod +x "$HOME/.vnc/xstartup" 2>/dev/null || true
     ensure_browser_setup
 

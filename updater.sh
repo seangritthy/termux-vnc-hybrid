@@ -65,10 +65,10 @@ if command -v proot-distro >/dev/null 2>&1; then
     fi
 
     if proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
-        echo "[+] Installing Debian Terminal & Firefox ESR inside Debian..."
+        echo "[+] Installing Debian XFCE4 Desktop, Terminal & Firefox ESR inside Debian..."
         proot-distro login debian -- bash -c "
             apt-get update -y && \
-            apt-get install -y xfce4-terminal firefox-esr || true
+            apt-get install -y xfce4 xfce4-terminal dbus-x11 firefox-esr desktop-base || true
         " 2>/dev/null || true
     fi
 
