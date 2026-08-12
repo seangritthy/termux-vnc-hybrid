@@ -231,6 +231,7 @@ start_vnc() {
     sleep 3
 
     if [ -d "$NOVNC_DIR" ]; then
+        command -v termux-fix-shebang >/dev/null 2>&1 && termux-fix-shebang "$NOVNC_DIR/utils/novnc_proxy" "$NOVNC_DIR/utils/websockify/run" 2>/dev/null || true
         echo "[+] Starting noVNC Web Proxy on Port $NOVNC_PORT (listening on 0.0.0.0)..."
         setsid nohup "$NOVNC_DIR/utils/novnc_proxy" --vnc 127.0.0.1:$VNC_PORT --listen 0.0.0.0:$NOVNC_PORT --heartbeat 30 </dev/null > "$HOME/.novnc.log" 2>&1 &
         sleep 2
