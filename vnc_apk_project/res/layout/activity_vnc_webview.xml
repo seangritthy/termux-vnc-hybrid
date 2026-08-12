@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#050608">
 
     <!-- WebView for noVNC engine -->
     <WebView
@@ -10,44 +10,48 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Top floating toolbar -->
+    <!-- Top floating pill toolbar -->
     <LinearLayout
         android:id="@+id/layout_web_toolbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:background="#D91E2029"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/toolbar_bg"
         android:orientation="horizontal"
-        android:padding="4dp">
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp">
 
         <Button
             android:id="@+id/btn_web_kbd"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackground"
             android:text="⌨️ Keyboard"
             android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/btn_web_reload"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackground"
             android:text="🔄 Reload"
             android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/btn_web_close"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackground"
             android:text="❌ Exit"
-            android:textColor="#EF4444"
-            android:textSize="12sp" />
+            android:textColor="#F87171"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

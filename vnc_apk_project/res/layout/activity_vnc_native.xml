@@ -2,70 +2,74 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#050608">
 
     <com.vnc.hybrid.VncCanvasView
         android:id="@+id/vnc_canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Top floating toolbar -->
+    <!-- Top floating pill toolbar -->
     <LinearLayout
         android:id="@+id/layout_rfb_toolbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp"
-        android:background="#D91E2029"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/toolbar_bg"
         android:orientation="horizontal"
-        android:padding="4dp">
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp">
 
         <Button
             android:id="@+id/btn_rfb_kbd"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackground"
             android:text="⌨️ Keyboard"
             android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/btn_rfb_keys"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackground"
-            android:text="⚡ Special Keys"
+            android:text="⚡ Keys"
             android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/btn_rfb_mouse"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackground"
-            android:text="🖱️ Left Click"
+            android:text="🖱️ Click"
             android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/btn_rfb_close"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackground"
             android:text="❌ Exit"
-            android:textColor="#EF4444"
-            android:textSize="12sp" />
+            android:textColor="#F87171"
+            android:textSize="13sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-    <!-- Bottom Special Keys Bar -->
+    <!-- Bottom Special Keys Floating Bar -->
     <HorizontalScrollView
         android:id="@+id/scroll_special_keys"
         android:layout_width="match_parent"
-        android:layout_height="44dp"
+        android:layout_height="52dp"
         android:layout_alignParentBottom="true"
-        android:background="#E6121318"
+        android:background="#ED0B0C10"
         android:visibility="gone">
 
         <LinearLayout
@@ -79,74 +83,92 @@
             <Button
                 android:id="@+id/key_esc"
                 android:layout_width="60dp"
-                android:layout_height="36dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="Esc"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_tab"
                 android:layout_width="60dp"
-                android:layout_height="36dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="Tab"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_ctrl"
                 android:layout_width="60dp"
-                android:layout_height="36dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="Ctrl"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_alt"
                 android:layout_width="60dp"
-                android:layout_height="36dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="Alt"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_up"
-                android:layout_width="50dp"
-                android:layout_height="36dp"
+                android:layout_width="52dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="▲"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_down"
-                android:layout_width="50dp"
-                android:layout_height="36dp"
+                android:layout_width="52dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="▼"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_left"
-                android:layout_width="50dp"
-                android:layout_height="36dp"
+                android:layout_width="52dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="◀"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_right"
-                android:layout_width="50dp"
-                android:layout_height="36dp"
+                android:layout_width="52dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/special_key_btn"
                 android:text="▶"
                 android:textColor="#FFFFFF"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
             <Button
                 android:id="@+id/key_cad"
-                android:layout_width="90dp"
-                android:layout_height="36dp"
+                android:layout_width="96dp"
+                android:layout_height="38dp"
+                android:background="@drawable/special_key_btn"
                 android:text="Ctrl+Alt+Del"
                 android:textColor="#F59E0B"
-                android:textSize="10sp" />
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

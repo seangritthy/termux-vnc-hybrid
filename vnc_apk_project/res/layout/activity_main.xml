@@ -11,160 +11,87 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Title / Header -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="VNC Hybrid Client v2.1"
-            android:textColor="@color/textPrimary"
-            android:textSize="26sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Next-Gen VNC Remote Viewer &amp; Termux Desktop Launcher"
-            android:textColor="@color/textSecondary"
-            android:textSize="14sp" />
-
-        <!-- Card 1: Local Termux VNC Quick Connect -->
+        <!-- App Brand Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@color/cardBg"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingBottom="12dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Local Termux Desktop"
-                android:textColor="@color/colorAccentLight"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_local_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:text="Checking local VNC server ports..."
-                android:textColor="@color/statusYellow"
-                android:textSize="13sp" />
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="App Logo"
+                android:src="@drawable/ic_launcher" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal">
+                android:layout_marginStart="14dp"
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btn_quick_novnc"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="6dp"
-                    android:background="@color/buttonPrimary"
-                    android:text="noVNC (6080)"
-                    android:textColor="#FFFFFF"
-                    android:textSize="13sp" />
+                    android:text="VNC Hybrid Client"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/btn_quick_rfb"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="6dp"
-                    android:background="@color/buttonSecondary"
-                    android:text="RFB Native (5901)"
-                    android:textColor="#FFFFFF"
+                    android:text="Dual-Engine VNC &amp; Termux Desktop Launcher"
+                    android:textColor="@color/textSecondary"
                     android:textSize="13sp" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Card 2: Custom Server Connection -->
+        <!-- Card 1: Local Termux VNC Quick Connect -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@color/cardBg"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/card_bg"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="18dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Connect to Remote / Custom VNC"
-                android:textColor="@color/textPrimary"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Host IP / Domain:"
-                android:textColor="@color/textSecondary"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/et_host"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="#2B2E3D"
-                android:hint="127.0.0.1 or 192.168.1.100"
-                android:inputType="textUri"
-                android:padding="10dp"
-                android:textColor="@color/textPrimary"
-                android:textColorHint="@color/textSecondary"
-                android:textSize="14sp" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="LOCAL TERMUX DESKTOP"
+                    android:textColor="@color/colorCyan"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_local_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="● Checking..."
+                    android:textColor="@color/statusYellow"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Port:"
-                android:textColor="@color/textSecondary"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/et_port"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:background="#2B2E3D"
-                android:hint="5901 (RFB) or 6080 (noVNC)"
-                android:inputType="number"
-                android:padding="10dp"
-                android:textColor="@color/textPrimary"
-                android:textColorHint="@color/textSecondary"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="VNC Password:"
+                android:text="Connect directly to XFCE4 Desktop running on this device."
                 android:textColor="@color/textSecondary"
-                android:textSize="12sp" />
-
-            <EditText
-                android:id="@+id/et_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:background="#2B2E3D"
-                android:hint="vnc123"
-                android:inputType="textPassword"
-                android:padding="10dp"
-                android:textColor="@color/textPrimary"
-                android:textColorHint="@color/textSecondary"
-                android:textSize="14sp" />
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -173,26 +100,149 @@
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/btn_custom_novnc"
+                    android:id="@+id/btn_quick_novnc"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="6dp"
-                    android:background="@color/buttonPrimary"
-                    android:text="Launch noVNC"
+                    android:background="@drawable/button_primary"
+                    android:text="🌐 noVNC (6080)"
                     android:textColor="#FFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/btn_quick_rfb"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/button_secondary"
+                    android:text="⚡ Native RFB (5901)"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Card 2: Custom / Remote Server Connection -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="REMOTE VNC SERVER SETUP"
+                android:textColor="@color/textPrimary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <!-- Host Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Server IP / Hostname"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_host"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="127.0.0.1 or 192.168.1.100"
+                android:inputType="textUri"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/textPrimary"
+                android:textColorHint="#4B5563"
+                android:textSize="14sp" />
+
+            <!-- Port Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Port Number"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_port"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="5901 (RFB) or 6080 (noVNC)"
+                android:inputType="number"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/textPrimary"
+                android:textColorHint="#4B5563"
+                android:textSize="14sp" />
+
+            <!-- Password Input -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="VNC Password"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/et_password"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/edit_text_bg"
+                android:hint="vnc123"
+                android:inputType="textPassword"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:textColor="@color/textPrimary"
+                android:textColorHint="#4B5563"
+                android:textSize="14sp" />
+
+            <!-- Action Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_custom_novnc"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/button_primary"
+                    android:text="Connect noVNC"
+                    android:textColor="#FFFFFF"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/btn_custom_rfb"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
                     android:layout_marginStart="6dp"
-                    android:background="@color/buttonSecondary"
-                    android:text="Launch RFB"
+                    android:background="@drawable/button_secondary"
+                    android:text="Connect RFB"
                     android:textColor="#FFFFFF"
-                    android:textSize="13sp" />
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 

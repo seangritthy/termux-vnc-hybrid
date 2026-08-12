@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!/usr/bin/env bash
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -39,10 +39,19 @@ javac -encoding UTF-8 \
     -d "$BUILD_DIR" \
     @"${BUILD_DIR}/sources.txt"
 
-# 3. Convert .class files to classes.dex using d8 with --min-api 24
-echo "3. Converting bytecode to classes.dex with d8 (min-api 24)..."
+# 3. Convert .class files to classes.dex using d8/r8
+echo "3. Converting bytecode to classes.dex..."
 find "$BUILD_DIR" -name "*.class" > "$BUILD_DIR/classes.txt"
-d8 --min-api 24 --output "$BIN_DIR" @"${BUILD_DIR}/classes.txt" --lib "$ANDROID_JAR"
+
+if command -v d8 >/dev/null 2>&1; then
+    d8 --min-api 24 --output "$BIN_DIR" @"${BUILD_DIR}/classes.txt" --lib "$ANDROID_JAR"
+else
+    if [ ! -f "/tmp/r8.jar" ]; then
+        echo "   [+] Downloading r8.jar helper..."
+        curl -sSL -o /tmp/r8.jar https://storage.googleapis.com/r8-releases/raw/8.2.42/r8.jar
+    fi
+    java -cp /tmp/r8.jar com.android.tools.r8.D8 --min-api 24 --output "$BIN_DIR" @"${BUILD_DIR}/classes.txt" --lib "$ANDROID_JAR"
+fi
 
 # 4. Package initial unaligned APK
 echo "4. Packaging APK resources..."
@@ -91,14 +100,17 @@ apksigner sign --ks "$KEYSTORE" \
 echo "=== ✅ Verification ==="
 apksigner verify -v "$SIGNED_APK"
 
+# Copy output to root project bin directory if exists
+if [ -d "$PROJECT_DIR/../bin" ]; then
+    cp -vf "$SIGNED_APK" "$PROJECT_DIR/../bin/$OUTPUT_APK_NAME" 2>/dev/null || true
+fi
+
 # 9. Release to /sdcard/Download/ and /storage/emulated/0/Download/
 echo "9. Copying APK to Downloads..."
 cp -vf "$SIGNED_APK" "$SDCARD_DOWNLOAD/$OUTPUT_APK_NAME" 2>/dev/null || true
 cp -vf "$SIGNED_APK" "$EMULATED_DOWNLOAD/$OUTPUT_APK_NAME" 2>/dev/null || true
 chmod 666 "$SDCARD_DOWNLOAD/$OUTPUT_APK_NAME" "$EMULATED_DOWNLOAD/$OUTPUT_APK_NAME" 2>/dev/null || true
 
-echo "🎉 APK successfully released to:"
-ls -la "$SDCARD_DOWNLOAD/$OUTPUT_APK_NAME" "$EMULATED_DOWNLOAD/$OUTPUT_APK_NAME" 2>/dev/null || true
-echo "💡 To trigger Android installation directly from Termux, run:"
-echo "   termux-open /sdcard/Download/$OUTPUT_APK_NAME"
+echo "🎉 APK successfully built and released to: $SIGNED_APK"
+
 
