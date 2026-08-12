@@ -1,21 +1,38 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!/usr/bin/env bash
 
 VNC_PORT=5901
 NOVNC_PORT=6080
 DISPLAY_NUM=":1"
 NOVNC_DIR="$HOME/.novnc"
 
+# Detect installation binary directory
+if [ -n "$PREFIX" ] && [ -d "$PREFIX/bin" ]; then
+    BIN_DIR="$PREFIX/bin"
+elif [ -d "/data/data/com.termux/files/usr/bin" ]; then
+    BIN_DIR="/data/data/com.termux/files/usr/bin"
+elif [ -w "/usr/local/bin" ]; then
+    BIN_DIR="/usr/local/bin"
+else
+    BIN_DIR="$HOME/.local/bin"
+    mkdir -p "$BIN_DIR"
+fi
+
 get_ip() {
-    local wifi_ip=$(ifconfig 2>/dev/null | awk '/wlan0/{flag=1} flag && /inet/{print $2; flag=0}')
-    if [ -n "$wifi_ip" ]; then
-        echo "$wifi_ip"
-    else
-        local ip=$(ifconfig 2>/dev/null | grep -E 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | head -n 1)
-        if [ -z "$ip" ]; then
-            ip="<YOUR_PHONE_IP>"
-        fi
-        echo "$ip"
+    local ip=""
+    if command -v ip >/dev/null 2>&1; then
+        ip=$(ip route get 1.1.1.1 2>/dev/null | awk '{print $7}' | head -n 1)
     fi
+    if [ -z "$ip" ] && command -v hostname >/dev/null 2>&1; then
+        ip=$(hostname -I 2>/dev/null | awk '{print $1}')
+    fi
+    if [ -z "$ip" ] && command -v ifconfig >/dev/null 2>&1; then
+        ip=$(ifconfig 2>/dev/null | awk '/wlan0/{flag=1} flag && /inet/{print $2; flag=0}')
+        [ -z "$ip" ] && ip=$(ifconfig 2>/dev/null | grep -E 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | head -n 1)
+    fi
+    if [ -z "$ip" ]; then
+        ip="<YOUR_SERVER_IP>"
+    fi
+    echo "$ip"
 }
 
 clean_locks() {
@@ -23,17 +40,26 @@ clean_locks() {
     pkill -9 -f "Xvnc" >/dev/null 2>&1 || true
     pkill -9 -f "novnc_proxy" >/dev/null 2>&1 || true
     pkill -9 -f "websockify" >/dev/null 2>&1 || true
-    rm -rf /data/data/com.termux/files/usr/tmp/.X*-lock 2>/dev/null || true
-    rm -rf /data/data/com.termux/files/usr/tmp/.X11-unix/X* 2>/dev/null || true
+
+    local tmp_dirs=("/tmp" "/data/data/com.termux/files/usr/tmp")
+    [ -n "$TMPDIR" ] && tmp_dirs+=("$TMPDIR")
+    [ -n "$PREFIX" ] && tmp_dirs+=("$PREFIX/tmp")
+
+    for dir in "${tmp_dirs[@]}"; do
+        if [ -d "$dir" ]; then
+            rm -rf "$dir"/.X*-lock 2>/dev/null || true
+            rm -rf "$dir"/.X11-unix/X* 2>/dev/null || true
+        fi
+    done
     rm -rf "$HOME/.vnc/*.pid" 2>/dev/null || true
     rm -rf "$HOME/.vnc/*.log" 2>/dev/null || true
 }
 
 ensure_browser_setup() {
-    mkdir -p /data/data/com.termux/files/usr/bin
-    if [ ! -f /data/data/com.termux/files/usr/bin/vnc-browser ]; then
-        cat << 'EOF' > /data/data/com.termux/files/usr/bin/vnc-browser
-#!/data/data/com.termux/files/usr/bin/env bash
+    mkdir -p "$BIN_DIR"
+    if [ ! -f "$BIN_DIR/vnc-browser" ]; then
+        cat << 'EOF' > "$BIN_DIR/vnc-browser"
+#!/usr/bin/env bash
 export DISPLAY="${DISPLAY:-:1}"
 export LIBGL_ALWAYS_SOFTWARE=1
 
@@ -49,7 +75,7 @@ else
     exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority firefox-esr "$@"
 fi
 EOF
-        chmod +x /data/data/com.termux/files/usr/bin/vnc-browser
+        chmod +x "$BIN_DIR/vnc-browser"
     fi
 
     # Create Debian desktop shortcuts inside proot Debian
@@ -215,3 +241,4 @@ case "$1" in
         start_vnc
         ;;
 esac
+

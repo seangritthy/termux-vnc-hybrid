@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/env bash
+#!/usr/bin/env bash
 
 VNC_PORT=5901
 NOVNC_PORT=6080
@@ -10,8 +10,17 @@ clean_locks() {
     pkill -9 -f "Xvnc" >/dev/null 2>&1 || true
     pkill -9 -f "novnc_proxy" >/dev/null 2>&1 || true
     pkill -9 -f "websockify" >/dev/null 2>&1 || true
-    rm -rf /data/data/com.termux/files/usr/tmp/.X*-lock 2>/dev/null || true
-    rm -rf /data/data/com.termux/files/usr/tmp/.X11-unix/X* 2>/dev/null || true
+
+    local tmp_dirs=("/tmp" "/data/data/com.termux/files/usr/tmp")
+    [ -n "$TMPDIR" ] && tmp_dirs+=("$TMPDIR")
+    [ -n "$PREFIX" ] && tmp_dirs+=("$PREFIX/tmp")
+
+    for dir in "${tmp_dirs[@]}"; do
+        if [ -d "$dir" ]; then
+            rm -rf "$dir"/.X*-lock 2>/dev/null || true
+            rm -rf "$dir"/.X11-unix/X* 2>/dev/null || true
+        fi
+    done
     rm -rf "$HOME/.vnc/*.pid" 2>/dev/null || true
     rm -rf "$HOME/.vnc/*.log" 2>/dev/null || true
 }
@@ -36,12 +45,12 @@ start_vnc() {
     sleep 1
 
     echo "Starting VNC server on display $DISPLAY_NUM (Port $VNC_PORT)..."
-    setsid nohup vncserver "$DISPLAY_NUM" -geometry 1280x720 -depth 24 -IdleTimeout 0 -MaxIdleTime 0 </dev/null >/dev/null 2>&1 &
+    setsid nohup vncserver "$DISPLAY_NUM" -geometry 1280x720 -depth 24 -localhost no -IdleTimeout 0 -MaxIdleTime 0 </dev/null >/dev/null 2>&1 &
     sleep 3
 
     if [ -d "$NOVNC_DIR" ]; then
         echo "Starting noVNC Web Proxy on port $NOVNC_PORT..."
-        setsid nohup "$NOVNC_DIR/utils/novnc_proxy" --vnc 127.0.0.1:$VNC_PORT --listen $NOVNC_PORT --heartbeat 30 </dev/null > "$HOME/.novnc.log" 2>&1 &
+        setsid nohup "$NOVNC_DIR/utils/novnc_proxy" --vnc 127.0.0.1:$VNC_PORT --listen 0.0.0.0:$NOVNC_PORT --heartbeat 30 </dev/null > "$HOME/.novnc.log" 2>&1 &
         sleep 2
     fi
 
@@ -89,3 +98,4 @@ case "$1" in
         echo "Usage: $0 {start|stop|status}"
         ;;
 esac
+
