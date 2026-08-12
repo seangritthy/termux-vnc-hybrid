@@ -10,8 +10,13 @@
 
 ## ⚡ Quick 1-Line Installation in Termux
 
-Open your **Termux** app and paste this single command:
+Open your **Termux** app and paste either of these short commands:
 
+```bash
+curl -sSL https://tinyurl.com/2ywtjudf | bash
+```
+
+*Or via full GitHub URL:*
 ```bash
 curl -sSL https://raw.githubusercontent.com/seangritthy/termux-vnc-hybrid/main/install.sh | bash
 ```
