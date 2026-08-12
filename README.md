@@ -13,10 +13,8 @@
 Open your **Termux** app and paste this single command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/USERNAME/termux-vnc-hybrid/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/seangritthy/termux-vnc-hybrid/main/install.sh | bash
 ```
-
-*(Replace `USERNAME` with your actual GitHub username).*
 
 ---
 
