@@ -5,10 +5,10 @@ echo "======================================================="
 echo "   🚀 TERMUX VNC & HYBRID CLIENT AUTOMATIC INSTALLER   "
 echo "======================================================="
 
-# 1. Update and install required packages
-echo "[+] Installing required packages (TigerVNC, XFCE4, Net-Tools, Git)..."
+# 1. Update and install required packages including Browsers
+echo "[+] Installing required packages (TigerVNC, XFCE4, NetSurf, Chromium, Net-Tools, Git)..."
 pkg update -y
-pkg install -y tigervnc xfce4 xfce4-terminal net-tools git wget curl termux-tools
+pkg install -y tigervnc xfce4 xfce4-terminal net-tools git wget curl termux-tools netsurf chromium
 
 # 2. Setup noVNC
 NOVNC_DIR="$HOME/.novnc"
@@ -26,10 +26,11 @@ if [ ! -f "$HOME/.vnc/passwd" ]; then
     chmod 600 "$HOME/.vnc/passwd"
 fi
 
-# 4. Copy vnc.sh script & create executable binary
+# 4. Copy vnc.sh & updater.sh scripts & create executable binaries
 SCRIPT_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cp -f "$SCRIPT_SRC/vnc.sh" "$HOME/vnc.sh"
-chmod +x "$HOME/vnc.sh"
+cp -f "$SCRIPT_SRC/updater.sh" "$HOME/updater.sh" 2>/dev/null || true
+chmod +x "$HOME/vnc.sh" "$HOME/updater.sh" 2>/dev/null || true
 
 # Create /data/data/com.termux/files/usr/bin/vnc command wrapper
 echo "[+] Creating 'vnc' global terminal command..."
@@ -51,19 +52,24 @@ if [ -f "$APK_PATH" ]; then
     termux-open "$SDCARD_APK" 2>/dev/null || true
 fi
 
-# 6. Start VNC Server
+# 6. Run updater script to set up browser desktop shortcuts and check internet
+"$HOME/vnc.sh" update
+
+# 7. Start VNC Server
 echo "[+] Starting VNC Server..."
 "$HOME/vnc.sh" start
 
 echo ""
 echo "======================================================="
-echo " 🎉 INSTALLATION COMPLETE!"
+echo " 🎉 INSTALLATION & INTERNET BROUSER SETUP COMPLETE!"
 echo "======================================================="
 echo " You can manage VNC anytime using:"
 echo "   vnc          -> Start VNC Server"
 echo "   vnc status   -> Check VNC Status"
 echo "   vnc stop     -> Stop VNC Server"
+echo "   vnc update   -> Update packages & VNC system"
 echo ""
 echo " Android App APK installed to: /sdcard/Download/vnc-hybrid-client.apk"
 echo " Web Access URL: http://127.0.0.1:6080/vnc.html?autoconnect=true&password=vnc123"
+echo " Desktop Browsers: Double-click 'Web Browser' or 'Chromium' in VNC"
 echo "======================================================="

@@ -29,12 +29,57 @@ clean_locks() {
     rm -rf "$HOME/.vnc/*.log" 2>/dev/null || true
 }
 
+ensure_browser_setup() {
+    mkdir -p /data/data/com.termux/files/usr/bin
+    if [ ! -f /data/data/com.termux/files/usr/bin/vnc-browser ]; then
+        cat << 'EOF' > /data/data/com.termux/files/usr/bin/vnc-browser
+#!/data/data/com.termux/files/usr/bin/env bash
+export DISPLAY="${DISPLAY:-:1}"
+export LIBGL_ALWAYS_SOFTWARE=1
+
+if command -v chromium >/dev/null 2>&1; then
+    exec chromium --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer "$@"
+elif command -v netsurf-gtk3 >/dev/null 2>&1; then
+    exec netsurf-gtk3 "$@"
+elif command -v netsurf >/dev/null 2>&1; then
+    exec netsurf "$@"
+elif command -v firefox >/dev/null 2>&1; then
+    exec firefox "$@"
+else
+    echo "No GUI browser found. Installing Chromium & NetSurf..."
+    pkg install -y chromium netsurf
+    exec chromium --no-sandbox --disable-gpu "$@"
+fi
+EOF
+        chmod +x /data/data/com.termux/files/usr/bin/vnc-browser
+    fi
+
+    local DESKTOP_DIR="$HOME/Desktop"
+    mkdir -p "$DESKTOP_DIR"
+    if [ ! -f "$DESKTOP_DIR/vnc-browser.desktop" ]; then
+        cat << 'EOF' > "$DESKTOP_DIR/vnc-browser.desktop"
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Web Browser (Internet)
+Comment=Launch default Internet Browser inside VNC
+Exec=vnc-browser %u
+Icon=web-browser
+Terminal=false
+Categories=Network;WebBrowser;
+StartupNotify=true
+EOF
+        chmod +x "$DESKTOP_DIR/vnc-browser.desktop"
+    fi
+}
+
 start_vnc() {
     echo "======================================================="
     echo "       STARTING VNC SERVER & DESKTOP (MULTI-DEVICE)    "
     echo "======================================================="
 
     chmod +x "$HOME/.vnc/xstartup" 2>/dev/null || true
+    ensure_browser_setup
 
     if [ ! -f "$HOME/.vnc/passwd" ]; then
         echo "[+] Setting default VNC password ('vnc123')..."
@@ -74,6 +119,10 @@ start_vnc() {
     echo " 2. FOR THIS PHONE (LOCAL):"
     echo "    - Web Browser: http://127.0.0.1:$NOVNC_PORT/vnc.html?autoconnect=true&password=vnc123"
     echo "    - VNC App:     127.0.0.1:$VNC_PORT"
+    echo "-------------------------------------------------------"
+    echo " 3. INTERNET BROWSING & SYSTEM UPDATES:"
+    echo "    - Open Desktop Icon: 'Web Browser' or 'Chromium'"
+    echo "    - Run System Updater: 'vnc update'"
     echo "======================================================="
 }
 
@@ -99,6 +148,20 @@ status_vnc() {
     else
         echo "[-] noVNC Web Proxy is NOT running."
     fi
+
+    if command -v vnc-browser >/dev/null 2>&1; then
+        echo "[+] Internet Browser launcher is READY (vnc-browser / Chromium / NetSurf)"
+    fi
+}
+
+update_vnc() {
+    if [ -f "$HOME/updater.sh" ]; then
+        bash "$HOME/updater.sh"
+    elif [ -f "$HOME/termux-vnc-hybrid/updater.sh" ]; then
+        bash "$HOME/termux-vnc-hybrid/updater.sh"
+    else
+        echo "[-] updater.sh not found."
+    fi
 }
 
 case "$1" in
@@ -110,6 +173,9 @@ case "$1" in
         ;;
     status)
         status_vnc
+        ;;
+    update|updater)
+        update_vnc
         ;;
     *)
         start_vnc

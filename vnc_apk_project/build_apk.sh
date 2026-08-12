@@ -1,7 +1,7 @@
 #!/data/data/com.termux/files/usr/bin/env bash
 set -e
 
-PROJECT_DIR="$HOME/vnc_apk_project"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="$PROJECT_DIR/build"
 GEN_DIR="$PROJECT_DIR/gen"
 BIN_DIR="$PROJECT_DIR/bin"
