@@ -60,11 +60,12 @@ ensure_browser_setup() {
     
     # Create vnc-browser helper
     cat << 'EOF' > "$BIN_DIR/vnc-browser"
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env bash
 export DISPLAY="${DISPLAY:-:1}"
 export LIBGL_ALWAYS_SOFTWARE=1
 
 if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+    [ -f "$HOME/.Xauthority" ] && proot-distro login debian -- bash -c "cp -f /data/data/com.termux/files/home/.Xauthority /root/.Xauthority" 2>/dev/null || true
     exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority firefox-esr "$@"
 elif command -v chromium >/dev/null 2>&1; then
     exec chromium --no-sandbox --disable-gpu --disable-dev-shm-usage --disable-software-rasterizer "$@"
@@ -73,22 +74,26 @@ elif command -v netsurf-gtk3 >/dev/null 2>&1; then
 elif command -v firefox >/dev/null 2>&1; then
     exec firefox "$@"
 else
+    [ -f "$HOME/.Xauthority" ] && proot-distro login debian -- bash -c "cp -f /data/data/com.termux/files/home/.Xauthority /root/.Xauthority" 2>/dev/null || true
     exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority firefox-esr "$@"
 fi
 EOF
     chmod +x "$BIN_DIR/vnc-browser"
+    command -v termux-fix-shebang >/dev/null 2>&1 && termux-fix-shebang "$BIN_DIR/vnc-browser" 2>/dev/null || true
 
     # Create vnc-debian-terminal helper
     cat << 'EOF' > "$BIN_DIR/vnc-debian-terminal"
-#!/usr/bin/env bash
+#!/data/data/com.termux/files/usr/bin/env bash
 export DISPLAY="${DISPLAY:-:1}"
 if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+    [ -f "$HOME/.Xauthority" ] && proot-distro login debian -- bash -c "cp -f /data/data/com.termux/files/home/.Xauthority /root/.Xauthority" 2>/dev/null || true
     exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority xfce4-terminal "$@"
 else
     exec xfce4-terminal "$@"
 fi
 EOF
     chmod +x "$BIN_DIR/vnc-debian-terminal"
+    command -v termux-fix-shebang >/dev/null 2>&1 && termux-fix-shebang "$BIN_DIR/vnc-debian-terminal" 2>/dev/null || true
 
     # Create 'debian' CLI shortcut wrapper across candidate bin paths
     if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
@@ -230,6 +235,7 @@ start_vnc() {
     echo "[+] Starting TigerVNC server on display $DISPLAY_NUM (Port $VNC_PORT, listening on all IPs)..."
     setsid nohup vncserver "$DISPLAY_NUM" -geometry 1280x720 -depth 24 -localhost no -IdleTimeout 0 -MaxIdleTime 0 </dev/null >/dev/null 2>&1 &
     sleep 3
+    [ -f "$HOME/.Xauthority" ] && proot-distro login debian -- bash -c "cp -f /data/data/com.termux/files/home/.Xauthority /root/.Xauthority" 2>/dev/null || true
 
     if [ -d "$NOVNC_DIR" ]; then
         command -v termux-fix-shebang >/dev/null 2>&1 && termux-fix-shebang "$NOVNC_DIR/utils/novnc_proxy" "$NOVNC_DIR/utils/websockify/run" 2>/dev/null || true
