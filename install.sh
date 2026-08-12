@@ -67,10 +67,24 @@ if [ ! -f "$HOME/.vnc/passwd" ]; then
     chmod 600 "$HOME/.vnc/passwd" 2>/dev/null || true
 fi
 
-# 4. Copy vnc.sh & updater.sh scripts & create executable binaries
-SCRIPT_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cp -f "$SCRIPT_SRC/vnc.sh" "$HOME/vnc.sh"
-cp -f "$SCRIPT_SRC/updater.sh" "$HOME/updater.sh" 2>/dev/null || true
+# 4. Copy or download vnc.sh & updater.sh scripts & create executable binaries
+GITHUB_RAW="https://raw.githubusercontent.com/seangritthy/termux-vnc-hybrid/main"
+SCRIPT_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "$HOME")"
+
+if [ -f "$SCRIPT_SRC/vnc.sh" ]; then
+    cp -f "$SCRIPT_SRC/vnc.sh" "$HOME/vnc.sh"
+else
+    echo "[+] Downloading vnc.sh script from GitHub..."
+    curl -sSL "$GITHUB_RAW/vnc.sh" -o "$HOME/vnc.sh"
+fi
+
+if [ -f "$SCRIPT_SRC/updater.sh" ]; then
+    cp -f "$SCRIPT_SRC/updater.sh" "$HOME/updater.sh"
+else
+    echo "[+] Downloading updater.sh script from GitHub..."
+    curl -sSL "$GITHUB_RAW/updater.sh" -o "$HOME/updater.sh"
+fi
+
 chmod +x "$HOME/vnc.sh" "$HOME/updater.sh" 2>/dev/null || true
 
 # Create global terminal command wrapper
@@ -85,14 +99,22 @@ chmod +x "$BIN_DIR/vnc"
 # 5. Copy & Install VNC Hybrid Client APK (if on Termux/Android)
 APK_PATH="$SCRIPT_SRC/bin/vnc-hybrid-client.apk"
 SDCARD_APK="/sdcard/Download/vnc-hybrid-client.apk"
+EMULATED_APK="/storage/emulated/0/Download/vnc-hybrid-client.apk"
+
+if [ ! -f "$APK_PATH" ]; then
+    TMP_APK="/tmp/vnc-hybrid-client.apk"
+    echo "[+] Fetching VNC Hybrid Client APK from GitHub..."
+    curl -sSL "$GITHUB_RAW/bin/vnc-hybrid-client.apk" -o "$TMP_APK" 2>/dev/null || true
+    [ -f "$TMP_APK" ] && APK_PATH="$TMP_APK"
+fi
 
 if [ -f "$APK_PATH" ]; then
     echo "[+] Copying VNC Hybrid Client APK to Downloads ($SDCARD_APK)..."
-    cp -f "$APK_PATH" "$SDCARD_APK" 2>/dev/null || cp -f "$APK_PATH" "/storage/emulated/0/Download/vnc-hybrid-client.apk" 2>/dev/null || true
+    cp -f "$APK_PATH" "$SDCARD_APK" 2>/dev/null || cp -f "$APK_PATH" "$EMULATED_APK" 2>/dev/null || true
     chmod 666 "$SDCARD_APK" 2>/dev/null || true
     if command -v termux-open >/dev/null 2>&1; then
         echo "[+] Triggering Android APK installation..."
-        termux-open "$SDCARD_APK" 2>/dev/null || true
+        termux-open "$SDCARD_APK" 2>/dev/null || termux-open "$EMULATED_APK" 2>/dev/null || true
     fi
 fi
 
