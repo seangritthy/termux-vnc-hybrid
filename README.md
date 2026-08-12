@@ -2,7 +2,7 @@
 
 > Full PRoot Debian XFCE4 Desktop Environment & Dual Engine VNC Client (Native RFB + noVNC Web Engine) for Termux on Android with Debian Terminal (`xfce4-terminal`), Firefox ESR, and One-Click System Updater.
 
-![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.4.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Android%20%7C%20Termux-orange.svg)
 
@@ -18,17 +18,16 @@ curl -sSL https://raw.githubusercontent.com/seangritthy/termux-vnc-hybrid/main/i
 
 ---
 
-## ✨ What's New in v2.3.0
+## ✨ What's New in v2.4.0
 
+- 🎨 **Modern Android APK UI Redesign**: Overhauled layout with modern card containers, rounded drawables, custom input fields, and floating translucent toolbars for RFB & noVNC viewers.
+- 🛠️ **Cross-Platform Compatibility**: Enhanced `install.sh`, `vnc.sh`, `updater.sh`, and `vncmanager.sh` to run portably on Termux, Debian, Ubuntu, and standard Linux.
+- 📦 **Automated Build Tooling**: Added `r8.jar` fallback to build, zipalign, and sign APK binaries seamlessly without requiring full Android SDK installations.
 - 🛡️ **VNC Auto-Disconnect Prevention**: Termux CPU wake-lock acquired on startup to prevent Android CPU & Wi-Fi sleep.
 - ⚡ **Zero-Timeout Idle Mode**: Added `-IdleTimeout 0` and `-MaxIdleTime 0` flags to TigerVNC server to keep remote desktop active indefinitely.
 - 💓 **WebSocket Heartbeat**: Added `--heartbeat 30` WebSocket ping to noVNC proxy to prevent socket drops when idle.
 - 🖥️ **Screen Saver & DPMS Blanking Disabled**: Auto-disables X11 screen blanking, DPMS power management, and screensaver lock in `xstartup`.
 - 🐧 **PRoot-Distro Debian Integration**: Runs full Debian Linux environment inside VNC with glibc, apt, and desktop GUI.
-- 💻 **Debian Terminal Included**: Features pre-installed `xfce4-terminal` inside VNC desktop with full Debian root access (`root@debian:~#`).
-- 🌐 **Firefox ESR Web Browser**: Pre-installed Firefox browser in Debian for smooth browsing inside VNC.
-- 🔄 **Built-in System & Debian Updater**: One command `vnc update` (or `~/updater.sh`) upgrades all Termux packages, PRoot Debian packages, noVNC proxy, and desktop launchers.
-- 🐚 **Termux CLI Command**: Type `debian` directly in Termux terminal anytime to enter the Debian shell.
 
 ---
 
