@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VNC Hybrid Client</string>
+    <string name="title_dashboard">VNC Connection Dashboard</string>
+    <string name="local_status_title">Termux Local VNC Status</string>
+    <string name="status_checking">Checking local VNC server ports...</string>
+    <string name="btn_quick_novnc">Connect via noVNC (Port 6080)</string>
+    <string name="btn_quick_native">Connect via RFB (Port 5901)</string>
+    <string name="title_custom_conn">Custom VNC Server Connection</string>
+    <string name="hint_host">Host IP / Domain (e.g. 127.0.0.1)</string>
+    <string name="hint_port">Port (5901 for RFB, 6080 for noVNC)</string>
+    <string name="hint_password">VNC Password (default: vnc123)</string>
+    <string name="btn_connect_web">Launch noVNC Web Engine</string>
+    <string name="btn_connect_native">Launch Native RFB Engine</string>
+    <string name="mode_novnc">noVNC (Web)</string>
+    <string name="mode_rfb">RFB (Native)</string>
+</resources>

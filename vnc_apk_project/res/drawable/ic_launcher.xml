@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- App Icon Dark Card Background with Rounded Corners -->
+    <path
+        android:fillColor="#0F172A"
+        android:pathData="M 16,6 L 92,6 C 97.5,6 102,10.5 102,16 L 102,92 C 102,97.5 97.5,102 92,102 L 16,102 C 10.5,102 6,97.5 6,92 L 6,16 C 6,10.5 10.5,6 16,6 Z" />
+
+    <!-- Subtle Accent Glow Ring -->
+    <path
+        android:fillColor="#1E293B"
+        android:pathData="M 18,18 L 90,18 C 92.2,18 94,19.8 94,22 L 94,86 C 94,88.2 92.2,90 90,90 L 18,90 C 15.8,90 14,88.2 14,86 L 14,22 C 14,19.8 15.8,18 18,18 Z" />
+
+    <!-- Monitor Outer Body -->
+    <path
+        android:fillColor="#334155"
+        android:pathData="M 22,24 L 86,24 C 89.3,24 92,26.7 92,30 L 92,64 C 92,67.3 89.3,70 86,70 L 22,70 C 18.7,70 16,67.3 16,64 L 16,30 C 16,26.7 18.7,24 22,24 Z" />
+
+    <!-- Monitor Screen Surface -->
+    <path
+        android:fillColor="#090D16"
+        android:pathData="M 20,28 L 88,28 L 88,62 L 20,62 Z" />
+
+    <!-- Monitor Stand Base -->
+    <path
+        android:fillColor="#475569"
+        android:pathData="M 46,70 L 62,70 L 66,82 L 42,82 Z" />
+    <path
+        android:fillColor="#64748B"
+        android:pathData="M 34,82 L 74,82 L 74,86 L 34,86 Z" />
+
+    <!-- Screen Remote Connection Signal / Wifi Waves -->
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M 26,34 L 38,34 L 38,37 L 26,37 Z" />
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M 26,40 L 44,40 L 44,43 L 26,43 Z" />
+
+    <!-- Electric Cyan VNC Remote Lightning Bolt Icon -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M 58,32 L 44,47 L 54,47 L 50,60 L 64,45 L 54,45 Z" />
+
+    <!-- Connection Status Glow Dot -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M 80,33 C 81.6,33 83,34.4 83,36 C 83,37.6 81.6,39 80,39 C 78.4,39 77,37.6 77,36 C 77,34.4 78.4,33 80,33 Z" />
+
+</vector>
+
