@@ -52,8 +52,36 @@ echo "[+] Installing VNC & XFCE4 Desktop Environment..."
 install_packages tigervnc xfce4 xfce4-terminal || \
 install_packages tigervnc-standalone-server tigervnc-common xfce4 xfce4-terminal || true
 
-echo "[+] Installing Web Browsers..."
-install_packages netsurf-gtk || install_packages netsurf || install_packages chromium || true
+echo "[+] Installing Web Browsers & PRoot Distro..."
+install_packages netsurf-gtk proot-distro || install_packages netsurf proot-distro || install_packages chromium proot-distro || true
+
+# Setup PRoot Debian Linux & CLI shortcut
+if command -v proot-distro >/dev/null 2>&1; then
+    if ! proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+        echo "[+] Installing Debian Linux distribution via proot-distro..."
+        proot-distro install debian || true
+    fi
+
+    if proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+        echo "[+] Installing Debian Terminal & Firefox ESR inside Debian..."
+        proot-distro login debian -- bash -c "
+            apt-get update -y && \
+            apt-get install -y xfce4-terminal firefox-esr || true
+        " 2>/dev/null || true
+    fi
+
+    # Create 'debian' CLI command shortcut
+    for bdir in "$BIN_DIR" "/data/data/com.termux/files/usr/bin" "/usr/local/bin" "$HOME/bin" "$HOME/.local/bin"; do
+        if [ -d "$bdir" ] || [ -d "$(dirname "$bdir")" ]; then
+            mkdir -p "$bdir" 2>/dev/null || true
+            cat << 'EOF' > "$bdir/debian"
+#!/usr/bin/env bash
+exec proot-distro login debian "$@"
+EOF
+            chmod +x "$bdir/debian" 2>/dev/null || true
+        fi
+    done
+fi
 
 # 2. Setup noVNC
 NOVNC_DIR="$HOME/.novnc"

@@ -57,8 +57,9 @@ clean_locks() {
 
 ensure_browser_setup() {
     mkdir -p "$BIN_DIR"
-    if [ ! -f "$BIN_DIR/vnc-browser" ]; then
-        cat << 'EOF' > "$BIN_DIR/vnc-browser"
+    
+    # Create vnc-browser helper
+    cat << 'EOF' > "$BIN_DIR/vnc-browser"
 #!/usr/bin/env bash
 export DISPLAY="${DISPLAY:-:1}"
 export LIBGL_ALWAYS_SOFTWARE=1
@@ -75,11 +76,34 @@ else
     exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority firefox-esr "$@"
 fi
 EOF
-        chmod +x "$BIN_DIR/vnc-browser"
-    fi
+    chmod +x "$BIN_DIR/vnc-browser"
 
-    # Create Debian desktop shortcuts inside proot Debian
+    # Create vnc-debian-terminal helper
+    cat << 'EOF' > "$BIN_DIR/vnc-debian-terminal"
+#!/usr/bin/env bash
+export DISPLAY="${DISPLAY:-:1}"
+if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+    exec proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority xfce4-terminal "$@"
+else
+    exec xfce4-terminal "$@"
+fi
+EOF
+    chmod +x "$BIN_DIR/vnc-debian-terminal"
+
+    # Create 'debian' CLI shortcut wrapper across candidate bin paths
     if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+        for bdir in "$BIN_DIR" "/data/data/com.termux/files/usr/bin" "/usr/local/bin" "$HOME/bin" "$HOME/.local/bin"; do
+            if [ -d "$bdir" ] || [ -d "$(dirname "$bdir")" ]; then
+                mkdir -p "$bdir" 2>/dev/null || true
+                cat << 'EOC' > "$bdir/debian"
+#!/usr/bin/env bash
+exec proot-distro login debian "$@"
+EOC
+                chmod +x "$bdir/debian" 2>/dev/null || true
+            fi
+        done
+
+        # Also create desktop icons inside proot Debian /root/Desktop
         proot-distro login debian -- bash -c "mkdir -p /root/Desktop && cat << 'EOF' > /root/Desktop/debian-terminal.desktop
 [Desktop Entry]
 Version=1.0
@@ -108,23 +132,37 @@ chmod +x /root/Desktop/firefox.desktop
 " 2>/dev/null || true
     fi
 
+    # Create shortcuts on Termux VNC Desktop ($HOME/Desktop)
     local DESKTOP_DIR="$HOME/Desktop"
     mkdir -p "$DESKTOP_DIR"
-    if [ ! -f "$DESKTOP_DIR/vnc-browser.desktop" ]; then
-        cat << 'EOF' > "$DESKTOP_DIR/vnc-browser.desktop"
+
+    cat << 'EOF' > "$DESKTOP_DIR/debian-terminal.desktop"
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=Web Browser (Internet)
-Comment=Launch default Internet Browser inside VNC
+Name=Debian Terminal
+Comment=Open Debian Root Terminal inside VNC
+Exec=vnc-debian-terminal
+Icon=utilities-terminal
+Terminal=false
+Categories=System;TerminalEmulator;
+StartupNotify=true
+EOF
+    chmod +x "$DESKTOP_DIR/debian-terminal.desktop"
+
+    cat << 'EOF' > "$DESKTOP_DIR/vnc-browser.desktop"
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Web Browser (Firefox / Internet)
+Comment=Launch Firefox / Web Browser inside VNC
 Exec=vnc-browser %u
 Icon=web-browser
 Terminal=false
 Categories=Network;WebBrowser;
 StartupNotify=true
 EOF
-        chmod +x "$DESKTOP_DIR/vnc-browser.desktop"
-    fi
+    chmod +x "$DESKTOP_DIR/vnc-browser.desktop"
 }
 
 start_vnc() {
