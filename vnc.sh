@@ -180,26 +180,22 @@ xset s off 2>/dev/null || true
 xset -dpms 2>/dev/null || true
 xset s noblank 2>/dev/null || true
 
-# Check if PRoot Debian has XFCE4 desktop installed
-DEBIAN_READY=0
-if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
-    if proot-distro login debian -- bash -c "command -v startxfce4" >/dev/null 2>&1; then
-        DEBIAN_READY=1
-    fi
-fi
-
-if [ "$DEBIAN_READY" -eq 1 ]; then
-    exec proot-distro login debian --shared-tmp --bind /data/data/com.termux/files/usr/tmp:/tmp -- env DISPLAY="${DISPLAY:-:1}" dbus-launch --exit-with-session startxfce4
-elif command -v startxfce4 >/dev/null 2>&1; then
+# Start XFCE4 Desktop Session natively for instant display setup
+if command -v startxfce4 >/dev/null 2>&1; then
     if command -v dbus-launch >/dev/null 2>&1; then
-        exec dbus-launch --exit-with-session startxfce4
+        dbus-launch --exit-with-session startxfce4 &
     else
-        exec startxfce4
+        startxfce4 &
     fi
 elif command -v xfce4-session >/dev/null 2>&1; then
-    exec xfce4-session
+    xfce4-session &
 else
-    exec xterm
+    xterm &
+fi
+
+# Auto-launch Debian Linux Terminal on Desktop startup if Debian is installed
+if command -v proot-distro >/dev/null 2>&1 && proot-distro list 2>/dev/null | grep -q "debian (installed)"; then
+    (sleep 2 && proot-distro login debian --shared-tmp -- env DISPLAY="${DISPLAY:-:1}" XAUTHORITY=/root/.Xauthority xfce4-terminal) &
 fi
 EOF
     chmod +x "$HOME/.vnc/xstartup"
